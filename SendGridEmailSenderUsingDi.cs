@@ -4,26 +4,19 @@ using Microsoft.AspNetCore.Identity.UI.Services;
 
 namespace AspNetIdentityEmailsWithSendGrid;
 
-public class SendGridEmailSender : IEmailSender
+public class SendGridEmailSenderUsingDi : IEmailSender
 {
-    private readonly IConfiguration configuration;
+    private readonly ISendGridClient sendGridClient;
     private readonly ILogger logger;
 
-    public SendGridEmailSender(IConfiguration configuration, ILogger<SendGridEmailSender> logger)
+    public SendGridEmailSenderUsingDi(ISendGridClient sendGridClient, ILogger<SendGridEmailSenderUsingDi> logger)
     {
-        this.configuration = configuration;
+        this.sendGridClient = sendGridClient;
         this.logger = logger;
     }
 
     public async Task SendEmailAsync(string toEmail, string subject, string message)
     {
-        string sendGridApiKey = configuration["SendGridApiKey"];
-        if (string.IsNullOrEmpty(sendGridApiKey))
-        {
-            throw new Exception("The 'SendGridApiKey' is not configured");
-        }
-        
-        var client = new SendGridClient(sendGridApiKey);
         var msg = new SendGridMessage()
         {
             From = new EmailAddress("nielsswimberghe@gmail.com", "[YOUR_WEBSITE_NAME]"),
@@ -33,7 +26,7 @@ public class SendGridEmailSender : IEmailSender
         };
         msg.AddTo(new EmailAddress(toEmail));
 
-        var response = await client.SendEmailAsync(msg);
+        var response = await sendGridClient.SendEmailAsync(msg);
         if (response.IsSuccessStatusCode)
         {
             logger.LogInformation("Email queued successfully");
