@@ -26,7 +26,7 @@ public class SendGridEmailSender : IEmailSender
         var client = new SendGridClient(sendGridApiKey);
         var msg = new SendGridMessage()
         {
-            From = new EmailAddress("nielsswimberghe@gmail.com", "[YOUR_WEBSITE_NAME]"),
+            From = new EmailAddress("[YOUR_EMAIL_ADDRESS]", "[YOUR_WEBSITE_NAME]"),
             Subject = subject,
             PlainTextContent = message,
             HtmlContent = message
@@ -40,7 +40,7 @@ public class SendGridEmailSender : IEmailSender
         }
         else
         {
-            logger.LogError("Failed send email");
+            logger.LogError("Failed to send email");
             // Adding more information related to the failed email could be helpful in debugging failure,
             // but be careful about logging PII, as it increases the chance of leaking PII
         }

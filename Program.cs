@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using AspNetIdentityEmailsWithSendGrid.Data;
 using Microsoft.AspNetCore.Identity.UI.Services;
+using SendGrid.Extensions.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,7 +17,12 @@ builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.Requ
     .AddEntityFrameworkStores<ApplicationDbContext>();
 builder.Services.AddRazorPages();
 
-builder.Services.AddTransient<IEmailSender, SendGridEmailSender>();
+builder.Services.AddSendGrid(options =>
+    options.ApiKey = builder.Configuration.GetValue<string>("SendGridApiKey")
+                     ?? throw new Exception("The 'SendGridApiKey' is not configured")
+);
+//builder.Services.AddTransient<IEmailSender, SendGridEmailSender>();
+builder.Services.AddTransient<IEmailSender, SendGridEmailSenderUsingDi>();
 
 var app = builder.Build();
 
